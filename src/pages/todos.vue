@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>todos</h1>
+    <h1 class="my-4">Todos</h1>
     <Table :fields="fields" variant="todos" />
   </div>
 </template>
@@ -13,7 +13,7 @@ export default {
     Table,
   },
   data() {
-    return { items: [], fields: ["title", "completed"] };
+    return { fields: ["title", "completed"] };
   },
 };
 </script>

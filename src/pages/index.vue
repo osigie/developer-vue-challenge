@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>posts</h1>
+    <h1 class="my-4">Posts</h1>
     <Table :fields="fields" type="Posts" />
   </div>
 </template>

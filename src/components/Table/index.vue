@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-input-group>
+    <b-input-group class="mb-1 w-50" size="md">
       <template #prepend>
         <b-input-group-text>
           <b-icon icon="search"></b-icon
@@ -23,13 +23,13 @@
       :current-page="currentPage"
       :per-page="perPage"
       @row-clicked="handleClick"
-      :busy="isBusy"
+      :busy.sync="isBusy"
       @filtered="onFiltered"
     >
       <template #cell(completed)="row" v-if="variant === 'todos'">
         <b-form-checkbox v-model="row.item.completed"> </b-form-checkbox>
       </template>
-      <template v-slot:busy>
+      <template #table-busy>
         <div class="text-center">
           <b-spinner label="Loading..."></b-spinner>
         </div>
@@ -68,8 +68,6 @@
         ></b-pagination>
       </b-col>
     </b-row>
-
-    <!-- Info modal -->
     <b-modal :id="infoModal.id" title="Creator" ok-only @hide="resetInfoModal">
       <pre>Posted by {{ infoModal.content }}</pre>
     </b-modal>
@@ -123,45 +121,39 @@ export default {
     handleClick(item) {
       this.getUser(item.userId);
     },
+    sendToast() {
+      this.$bvToast.toast(`Error fetching data`, {
+        title: "Error",
+        variant: "danger",
+        autoHideDelay: 1000,
+        appendToast: false,
+        solid: true,
+      });
+    },
 
     async getUser(id) {
-      //   this.creditorAPIStatus.creatingCreditor = true;
       try {
         const res = await this.$nuxt.$api.getUser(id);
-        console.log(res);
         this.infoModal.content = res.name;
         this.$root.$emit("bv::show::modal", this.infoModal.id);
-
-        // this.creditorAPIStatus.creatingCreditor = false;
       } catch (error) {
-        // this.$nuxt.$snackbar.error(
-        //   "Error occured. Could not create organization"
-        // );
-        // this.creditorAPIStatus.creatingCreditor = false;
-
-        console.log({ error });
+        this.sendToast();
       }
     },
     async getData(type) {
-      //   this.creditorAPIStatus.creatingCreditor = true;
+      this.isBusy = true;
       let call;
       type === "Posts"
         ? (call = this.$nuxt.$api.posts())
         : (call = this.$nuxt.$api.todos());
-      this.isBusy = true;
       try {
         const res = await call;
         this.items = res;
         this.totalRows = res.length;
         this.isBusy = false;
-        // this.creditorAPIStatus.creatingCreditor = false;
       } catch (error) {
-        // this.$nuxt.$snackbar.error(
-        //   "Error occured. Could not create organization"
-        // );
-        // this.creditorAPIStatus.creatingCreditor = false;
+        this.sendToast();
         this.isBusy = false;
-        console.log({ error });
       }
     },
   },
